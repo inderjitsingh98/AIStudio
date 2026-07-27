@@ -1,5 +1,7 @@
 import Image from "next/image";
 import { SkillCard } from "@/components/SkillCard";
+import { SearchBar } from "@/components/SearchBar";
+
 
 const skills = [
   {
@@ -40,6 +42,17 @@ export default function Home() {
           <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
             Discover and execute trusted AI skills for enterprise data quality.
           </p>
+          <SearchBar />
+
+<div className="grid w-full gap-4">
+  {skills.map((skill) => (
+    <SkillCard
+      key={skill.id}
+      name={skill.name}
+      description={skill.description}
+    />
+  ))}
+</div>
           <div className="grid w-full gap-4">
           {skills.map((skill) => (
             <SkillCard

@@ -1,5 +1,4 @@
-import { SkillCard } from "@/components/SkillCard";
-import { SearchBar } from "@/components/SearchBar";
+import { CapabilityMarketplace } from "@/components/CapabilityMarketplace";
 
 const skills = [
   {
@@ -104,34 +103,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="capabilities" className="space-y-6">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <div className="max-w-2xl">
-              <h2 className="text-2xl font-semibold tracking-tight text-zinc-950 sm:text-3xl">
-                Capability marketplace
-              </h2>
-              <p className="mt-2 text-base leading-7 text-zinc-600">
-                A focused catalog of reusable AI building blocks for data quality and lineage teams.
-              </p>
-            </div>
-
-            <div className="w-full max-w-xl">
-              <SearchBar />
-            </div>
-          </div>
-
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {skills.map((skill) => (
-              <SkillCard
-                key={skill.id}
-                type={skill.type}
-                category={skill.category}
-                name={skill.name}
-                description={skill.description}
-              />
-            ))}
-          </div>
-        </section>
+        <CapabilityMarketplace capabilities={skills} />
       </main>
     </div>
   );

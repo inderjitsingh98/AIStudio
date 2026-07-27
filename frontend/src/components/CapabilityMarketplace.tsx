@@ -1,16 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import type { Capability } from "@/data/capabilities";
 import { SearchBar } from "@/components/SearchBar";
 import { SkillCard } from "@/components/SkillCard";
-
-type Capability = {
-  id: string;
-  type: string;
-  category: string;
-  name: string;
-  description: string;
-};
 
 type CapabilityMarketplaceProps = {
   capabilities: Capability[];
@@ -55,6 +48,7 @@ export function CapabilityMarketplace({
           {filteredCapabilities.map((capability) => (
             <SkillCard
               key={capability.id}
+              id={capability.id}
               type={capability.type}
               category={capability.category}
               name={capability.name}

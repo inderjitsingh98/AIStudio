@@ -1,11 +1,13 @@
-type SkillCardProps = {
-  type: string;
-  category: string;
-  name: string;
-  description: string;
-};
+import Link from "next/link";
+import type { Capability } from "@/data/capabilities";
+
+type SkillCardProps = Pick<
+  Capability,
+  "id" | "type" | "category" | "name" | "description"
+>;
 
 export function SkillCard({
+  id,
   type,
   category,
   name,
@@ -30,9 +32,12 @@ export function SkillCard({
         {description}
       </p>
 
-      <p className="mt-6 text-sm font-semibold text-indigo-700">
+      <Link
+        href={`/capabilities/${id}`}
+        className="mt-6 text-sm font-semibold text-indigo-700 transition-colors hover:text-indigo-800"
+      >
         Open capability
-      </p>
+      </Link>
     </article>
   );
 }

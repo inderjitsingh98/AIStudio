@@ -1,31 +1,5 @@
 import { CapabilityMarketplace } from "@/components/CapabilityMarketplace";
-
-const skills = [
-  {
-    id: "data-quality-rules",
-    type: "Skill",
-    category: "Data Governance",
-    name: "Data Quality Rules",
-    description:
-      "Generate, validate, and execute reusable data quality rules.",
-  },
-  {
-    id: "data-quality-scorecard",
-    type: "App",
-    category: "Observability",
-    name: "Data Quality Scorecard",
-    description:
-      "Measure completeness, validity, consistency, and uniqueness.",
-  },
-  {
-    id: "data-lineage-explorer",
-    type: "Agent",
-    category: "Discovery",
-    name: "Data Lineage Explorer",
-    description:
-      "Understand how enterprise data moves between systems.",
-  },
-];
+import { capabilities } from "@/data/capabilities";
 export default function Home() {
   return (
     <div className="min-h-screen bg-zinc-100 text-zinc-950">
@@ -103,7 +77,7 @@ export default function Home() {
           </div>
         </section>
 
-        <CapabilityMarketplace capabilities={skills} />
+        <CapabilityMarketplace capabilities={capabilities} />
       </main>
     </div>
   );

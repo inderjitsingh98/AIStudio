@@ -1,7 +1,26 @@
 import Image from "next/image";
 import { SkillCard } from "@/components/SkillCard";
 
-
+const skills = [
+  {
+    id: "data-quality-rules",
+    name: "Data Quality Rules",
+    description:
+      "Generate, validate, and execute reusable data quality rules.",
+  },
+  {
+    id: "data-quality-scorecard",
+    name: "Data Quality Scorecard",
+    description:
+      "Measure completeness, validity, consistency, and uniqueness.",
+  },
+  {
+    id: "data-lineage-explorer",
+    name: "Data Lineage Explorer",
+    description:
+      "Understand how enterprise data moves between systems.",
+  },
+];
 export default function Home() {
   return (
     <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
@@ -21,11 +40,15 @@ export default function Home() {
           <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
             Discover and execute trusted AI skills for enterprise data quality.
           </p>
-          <SkillCard
-  name="Data Quality Rules"
-  description="Generate, validate, and execute reusable data quality rules."
-/>
-
+          <div className="grid w-full gap-4">
+          {skills.map((skill) => (
+            <SkillCard
+              key={skill.id}
+              name={skill.name}
+              description={skill.description}
+            />
+          ))}
+</div>
           <div>
             <a
               href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"

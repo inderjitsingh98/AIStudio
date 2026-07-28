@@ -1,5 +1,6 @@
 import { CapabilityMarketplace } from "@/components/CapabilityMarketplace";
 import { capabilities } from "@/data/capabilities";
+import { ApiStatus } from "@/components/ApiStatus";
 export default function Home() {
   return (
     <div className="min-h-screen bg-zinc-100 text-zinc-950">
@@ -14,6 +15,7 @@ export default function Home() {
             </p>
           </div>
 
+<ApiStatus />
           <nav aria-label="Primary" className="hidden items-center gap-8 text-sm font-medium text-zinc-600 md:flex">
             <a href="#capabilities" className="transition-colors hover:text-zinc-950">
               Explore

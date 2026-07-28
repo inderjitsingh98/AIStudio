@@ -41,3 +41,9 @@ npm run dev
 This app uses the App Router, server components by default, and a single client boundary for search interaction.
 
 For the implementation details and intent, see [ARCHITECTURE.md](ARCHITECTURE.md).
+
+## Recent Updates
+
+1. Added a polished enterprise-style marketplace homepage.
+2. Added search across capability name, description, type, and category.
+3. Added capability detail pages with shared data.

@@ -25,6 +25,16 @@ The goal is to make it easy for a new user to:
 4. `src/components/SkillCard.tsx` renders one card per capability and links to the detail route.
 5. `src/app/capabilities/[id]/page.tsx` reads the URL parameter, finds the matching capability, and renders the detail view.
 
+```mermaid
+flowchart TD
+	A[src/data/capabilities.ts] --> B[src/app/page.tsx]
+	B --> C[src/components/CapabilityMarketplace.tsx]
+	C --> D[src/components/SearchBar.tsx]
+	C --> E[src/components/SkillCard.tsx]
+	E --> F[src/app/capabilities/[id]/page.tsx]
+	F --> A
+```
+
 ## Component Boundaries
 
 1. `src/app/page.tsx` is a Server Component.

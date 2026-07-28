@@ -27,12 +27,12 @@ The goal is to make it easy for a new user to:
 
 ```mermaid
 flowchart TD
-	A[src/data/capabilities.ts] --> B[src/app/page.tsx]
-	B --> C[src/components/CapabilityMarketplace.tsx]
-	C --> D[src/components/SearchBar.tsx]
-	C --> E[src/components/SkillCard.tsx]
-	E --> F[src/app/capabilities/[id]/page.tsx]
-	F --> A
+    A["src/data/capabilities.ts"] --> B["src/app/page.tsx"]
+    B --> C["src/components/CapabilityMarketplace.tsx"]
+    C --> D["src/components/SearchBar.tsx"]
+    C --> E["src/components/SkillCard.tsx"]
+    E --> F["src/app/capabilities/[id]/page.tsx"]
+    F --> A
 ```
 
 ## Component Boundaries

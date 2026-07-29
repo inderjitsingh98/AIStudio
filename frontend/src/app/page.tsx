@@ -55,7 +55,7 @@ export default function Home() {
                     Available
                   </dt>
                   <dd className="mt-3 text-2xl font-semibold text-zinc-950">
-                    3 capabilities
+                    {capabilities.length} capabilities
                   </dd>
                 </div>
                 <div className="rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-4">

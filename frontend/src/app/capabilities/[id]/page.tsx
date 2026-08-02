@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getCapabilityById } from "@/lib/api/capabilities";
+import { DataQualityRulesPlayground } from "@/components/DataQualityRulesPlayground";
 
 type CapabilityPageProps = {
   params: Promise<{
@@ -57,6 +58,10 @@ export default async function CapabilityPage({
             </p>
           </div>
         </article>
+
+        {capability.id === "data-quality-rules" && (
+          <DataQualityRulesPlayground capabilityId={capability.id} />
+        )}
       </main>
     </div>
   );

@@ -27,7 +27,7 @@ export function CapabilityMarketplace({
     : capabilities;
 
   return (
-    <section id="capabilities" className="space-y-6">
+    <section id="capabilities" className="space-y-6 scroll-mt-24">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div className="max-w-2xl">
           <h2 className="text-2xl font-semibold tracking-tight text-zinc-950 sm:text-3xl">
@@ -35,6 +35,9 @@ export function CapabilityMarketplace({
           </h2>
           <p className="mt-2 text-base leading-7 text-zinc-600">
             A focused catalog of governed, reusable AI capability building blocks for enterprise data workflows.
+          </p>
+          <p className="mt-2 text-sm font-medium text-zinc-500">
+            Showing {filteredCapabilities.length} of {capabilities.length} capabilities.
           </p>
         </div>
 

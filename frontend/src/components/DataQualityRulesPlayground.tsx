@@ -61,6 +61,37 @@ export function DataQualityRulesPlayground({
     {},
   );
   const [recordsInput, setRecordsInput] = useState(DEFAULT_RECORDS_INPUT);
+  const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">(
+    "idle",
+  );
+
+  const stages = [
+    "Configure",
+    "Generate",
+    "Review",
+    "Execute",
+    "Results",
+  ] as const;
+
+  const activeStageIndex = useMemo(() => {
+    if (completedExecution) {
+      return 4;
+    }
+
+    if (isExecuting) {
+      return 3;
+    }
+
+    if (execution) {
+      return 2;
+    }
+
+    if (isSubmitting) {
+      return 1;
+    }
+
+    return 0;
+  }, [completedExecution, execution, isExecuting, isSubmitting]);
 
   const approvedCount = useMemo(() => {
     if (!execution) {
@@ -76,8 +107,8 @@ export function DataQualityRulesPlayground({
     event.preventDefault();
     setValidationError(null);
     setBackendError(null);
+    setCopyState("idle");
 
-    // Derive dataset columns only at submit time for fast local feedback.
     const datasetColumns = datasetColumnsInput
       .split(/[\n,]/)
       .map((column) => column.trim())
@@ -142,7 +173,11 @@ export function DataQualityRulesPlayground({
       return;
     }
 
-    if (parsedRecords.some((item) => item === null || typeof item !== "object" || Array.isArray(item))) {
+    if (
+      parsedRecords.some(
+        (item) => item === null || typeof item !== "object" || Array.isArray(item),
+      )
+    ) {
       setValidationError("Every record must be a JSON object.");
       return;
     }
@@ -180,6 +215,28 @@ export function DataQualityRulesPlayground({
     !!execution &&
     completedExecution.executionId === execution.executionId;
 
+  async function handleCopyExecutionId() {
+    if (!completedExecution) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(completedExecution.executionId);
+      setCopyState("copied");
+    } catch {
+      setCopyState("failed");
+    }
+  }
+
+  function handleResetForNewExecution() {
+    setExecution(null);
+    setCompletedExecution(null);
+    setRuleDecisions({});
+    setValidationError(null);
+    setBackendError(null);
+    setCopyState("idle");
+  }
+
   return (
     <section className="rounded-3xl border border-zinc-200 bg-white p-8 shadow-sm ring-1 ring-zinc-950/5 sm:p-10">
       <header>
@@ -187,66 +244,177 @@ export function DataQualityRulesPlayground({
           Data quality rules playground
         </h2>
         <p className="mt-3 text-base leading-7 text-zinc-600">
-          Submit a dataset shape and plain-language requirements to generate
-          candidate validation rules.
+          Describe dataset intent in natural language, generate structured candidate
+          rules, review them, and execute only approved rules through deterministic
+          logic.
         </p>
+        <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-zinc-300 bg-zinc-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-zinc-700">
+          Provider: Mock (deterministic)
+        </div>
       </header>
 
-      <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-        <div>
-          <label
-            htmlFor="dataset-columns"
-            className="block text-sm font-semibold text-zinc-800"
-          >
-            Dataset columns
-          </label>
-          <p className="mt-2 text-sm text-zinc-500">
-            Enter columns separated by commas or new lines.
-          </p>
-          <textarea
-            id="dataset-columns"
-            value={datasetColumnsInput}
-            onChange={(event) => setDatasetColumnsInput(event.target.value)}
-            className="mt-3 min-h-24 w-full rounded-2xl border border-zinc-300 bg-zinc-50 px-4 py-3 text-zinc-900 outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-100"
-            placeholder="customer_id, email, signup_date"
-          />
-        </div>
+      <ol className="sticky top-20 z-10 mt-8 grid gap-2 rounded-2xl border border-zinc-200 bg-zinc-50/95 p-3 shadow-sm backdrop-blur sm:grid-cols-5">
+        {stages.map((stage, index) => {
+          const isDone = index < activeStageIndex;
+          const isActive = index === activeStageIndex;
+          return (
+            <li
+              key={stage}
+              className={`rounded-xl border px-3 py-2 text-sm font-medium ${
+                isActive
+                  ? "border-indigo-300 bg-indigo-50 text-indigo-800"
+                  : isDone
+                    ? "border-emerald-300 bg-emerald-50 text-emerald-800"
+                    : "border-zinc-200 bg-white text-zinc-600"
+              }`}
+            >
+              <span className="mr-2 inline-flex h-5 w-5 items-center justify-center rounded-full border border-current text-[10px] font-bold">
+                {isDone ? "OK" : index + 1}
+              </span>
+              {stage}
+            </li>
+          );
+        })}
+      </ol>
 
-        <div>
-          <label
-            htmlFor="requirements"
-            className="block text-sm font-semibold text-zinc-800"
-          >
-            Requirements
-          </label>
-          <textarea
-            id="requirements"
-            value={requirements}
-            onChange={(event) => setRequirements(event.target.value)}
-            className="mt-3 min-h-28 w-full rounded-2xl border border-zinc-300 bg-zinc-50 px-4 py-3 text-zinc-900 outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-100"
-            placeholder="Email must be present and valid; customer_id must be positive."
-          />
-        </div>
-
-        {(validationError || backendError) && (
-          <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            {validationError ?? backendError}
+      <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-5">
+            <label
+              htmlFor="dataset-columns"
+              className="block text-sm font-semibold text-zinc-800"
+            >
+              Dataset columns
+            </label>
+            <p className="mt-2 text-sm text-zinc-500">
+              Required. Enter columns separated by commas or new lines.
+            </p>
+            <textarea
+              id="dataset-columns"
+              value={datasetColumnsInput}
+              onChange={(event) => setDatasetColumnsInput(event.target.value)}
+              className="mt-3 min-h-24 w-full rounded-2xl border border-zinc-300 bg-white px-4 py-3 text-zinc-900 outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-100"
+              placeholder="customer_id, email, signup_date"
+            />
           </div>
-        )}
 
-        <div className="flex items-center justify-between gap-4">
-          <p className="text-sm text-zinc-500">
-            Flask remains the source of truth for request validation.
-          </p>
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="rounded-xl bg-indigo-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-700 disabled:cursor-not-allowed disabled:bg-indigo-300"
-          >
-            {isSubmitting ? "Generating..." : "Generate candidate rules"}
-          </button>
+          <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-5">
+            <label
+              htmlFor="requirements"
+              className="block text-sm font-semibold text-zinc-800"
+            >
+              Business requirements
+            </label>
+            <p className="mt-2 text-sm text-zinc-500">
+              Required. Describe expected data-quality rules in natural language.
+            </p>
+            <textarea
+              id="requirements"
+              value={requirements}
+              onChange={(event) => setRequirements(event.target.value)}
+              className="mt-3 min-h-32 w-full rounded-2xl border border-zinc-300 bg-white px-4 py-3 text-zinc-900 outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-100"
+              placeholder="Email must be present and valid; customer_id must be positive."
+            />
+          </div>
+
+          <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-5">
+            <label
+              htmlFor="sample-records"
+              className="block text-sm font-semibold text-zinc-800"
+            >
+              Sample records (JSON array)
+            </label>
+            <p className="mt-2 text-sm text-zinc-500">
+              Used during execution. Provide a non-empty array of JSON objects.
+            </p>
+            <textarea
+              id="sample-records"
+              value={recordsInput}
+              onChange={(event) => setRecordsInput(event.target.value)}
+              className="mt-3 min-h-44 w-full rounded-2xl border border-zinc-300 bg-white px-4 py-3 font-mono text-sm text-zinc-900 outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
+              aria-describedby="sample-records-help"
+              disabled={executionLocked}
+            />
+            <p id="sample-records-help" className="mt-2 text-xs text-zinc-500">
+              Example deterministic checks: required, minimum, and postal-code format.
+            </p>
+          </div>
+
+          {(validationError || backendError) && (
+            <div
+              className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+              role="alert"
+            >
+              {validationError ?? backendError}
+            </div>
+          )}
+
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-zinc-500">
+              Flask remains the source of truth for request validation.
+            </p>
+            <div className="flex flex-wrap items-center gap-2">
+              {executionLocked && (
+                <button
+                  type="button"
+                  onClick={handleResetForNewExecution}
+                  className="rounded-xl border border-zinc-300 bg-white px-4 py-3 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50"
+                >
+                  Generate new execution
+                </button>
+              )}
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="min-w-56 rounded-xl bg-indigo-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-700 disabled:cursor-not-allowed disabled:bg-indigo-300"
+              >
+                {isSubmitting
+                  ? "Generating governed candidate rules..."
+                  : "Generate candidate rules"}
+              </button>
+            </div>
+          </div>
+        </form>
+
+        <aside className="space-y-4 rounded-2xl border border-zinc-200 bg-white p-5">
+          <h3 className="text-lg font-semibold tracking-tight text-zinc-900">
+            What happens next
+          </h3>
+          {!execution ? (
+            <div className="space-y-3 text-sm leading-6 text-zinc-600">
+              <p>
+                Enter schema columns and requirements. AI proposes structured
+                candidate rules, then a human approves or rejects them before
+                deterministic execution.
+              </p>
+              <ol className="space-y-2">
+                <li className="rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2">1. Configure intent and schema</li>
+                <li className="rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2">2. Generate candidate rules</li>
+                <li className="rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2">3. Review and approve</li>
+                <li className="rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2">4. Execute approved rules</li>
+                <li className="rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2">5. Inspect quality scorecard</li>
+              </ol>
+            </div>
+          ) : (
+            <div className="space-y-3 text-sm leading-6 text-zinc-600">
+              <p>
+                Execution created. Review candidate rules, then run deterministic
+                validation on approved rules only.
+              </p>
+              <p className="rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2">
+                Status: {toStatusLabel(execution.status)} ({execution.status})
+              </p>
+            </div>
+          )}
+        </aside>
+      </div>
+
+      {isSubmitting && !execution && (
+        <div className="mt-8 grid gap-3 sm:grid-cols-2" aria-hidden="true">
+          <div className="h-20 animate-pulse rounded-2xl border border-zinc-200 bg-zinc-100" />
+          <div className="h-20 animate-pulse rounded-2xl border border-zinc-200 bg-zinc-100" />
         </div>
-      </form>
+      )}
 
       {execution && (
         <div className="mt-10 space-y-6">
@@ -288,6 +456,9 @@ export function DataQualityRulesPlayground({
                 </dd>
               </div>
             </dl>
+            <p className="mt-4 rounded-xl border border-amber-300 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-800">
+              Awaiting approval: review candidate rules before deterministic execution.
+            </p>
           </section>
 
           <section className="space-y-4">
@@ -300,97 +471,108 @@ export function DataQualityRulesPlayground({
               </p>
             </div>
 
-            <ul className="space-y-4">
-              {execution.candidateRules.map((rule) => {
-                const decision = ruleDecisions[rule.id] ?? "approved";
-                const isApproved = decision === "approved";
+            {execution.candidateRules.length === 0 ? (
+              <div className="rounded-2xl border border-zinc-200 bg-zinc-50 px-5 py-4 text-sm text-zinc-700">
+                No supported rules were generated for this request. Try requirements
+                that map to supported deterministic checks such as required fields,
+                minimum values, or postal-code format.
+              </div>
+            ) : (
+              <ul className="space-y-4">
+                {execution.candidateRules.map((rule) => {
+                  const decision = ruleDecisions[rule.id] ?? "approved";
+                  const isApproved = decision === "approved";
+                  const confidencePercent = Math.round(rule.confidence * 100);
 
-                return (
-                  <li
-                    key={rule.id}
-                    className="rounded-2xl border border-zinc-200 bg-white p-5"
-                  >
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                      <div className="space-y-2">
-                        <p className="text-sm font-semibold uppercase tracking-[0.16em] text-zinc-500">
-                          {rule.type} · {rule.severity} · {Math.round(rule.confidence * 100)}%
-                        </p>
-                        <p className="text-base font-semibold text-zinc-900">
-                          {rule.message}
-                        </p>
-                        <p className="text-sm text-zinc-600">
-                          Field: {rule.field}
-                          {typeof rule.value === "number" && ` · Value: ${rule.value}`}
-                          {rule.format && ` · Format: ${rule.format}`}
-                        </p>
-                      </div>
+                  return (
+                    <li
+                      key={rule.id}
+                      className="rounded-2xl border border-zinc-200 bg-white p-5 transition-colors hover:border-zinc-300"
+                    >
+                      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                        <div className="space-y-2">
+                          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">
+                            {rule.field}
+                          </p>
+                          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-indigo-700">
+                            {rule.type}
+                          </p>
+                          <p className="text-base font-semibold text-zinc-900">
+                            {rule.message}
+                          </p>
+                          <p className="text-sm text-zinc-600">
+                            Severity: {rule.severity}
+                            {typeof rule.value === "number" && ` · Value: ${rule.value}`}
+                            {rule.format && ` · Format: ${rule.format}`}
+                          </p>
+                          <div>
+                            <div className="flex items-center justify-between text-xs text-zinc-600">
+                              <span>Confidence</span>
+                              <span>{confidencePercent}%</span>
+                            </div>
+                            <div className="mt-1 h-2 rounded-full bg-zinc-200">
+                              <div
+                                className="h-full rounded-full bg-indigo-600"
+                                style={{ width: `${confidencePercent}%` }}
+                                aria-hidden="true"
+                              />
+                            </div>
+                          </div>
+                          <p className="text-sm font-medium text-zinc-700">
+                            Status: {isApproved ? "Approved" : "Rejected"}
+                          </p>
+                        </div>
 
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          aria-pressed={isApproved}
-                          disabled={executionLocked}
-                          onClick={() =>
-                            setRuleDecisions((current) => ({
-                              ...current,
-                              [rule.id]: "approved",
-                            }))
-                          }
-                          className={`rounded-lg border px-3 py-2 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-700 disabled:cursor-not-allowed disabled:opacity-60 ${
-                            isApproved
-                              ? "border-emerald-300 bg-emerald-50 text-emerald-700"
-                              : "border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50"
-                          }`}
-                        >
-                          {isApproved ? "Approved" : "Mark approved"}
-                        </button>
-                        <button
-                          type="button"
-                          aria-pressed={!isApproved}
-                          disabled={executionLocked}
-                          onClick={() =>
-                            setRuleDecisions((current) => ({
-                              ...current,
-                              [rule.id]: "rejected",
-                            }))
-                          }
-                          className={`rounded-lg border px-3 py-2 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-700 disabled:cursor-not-allowed disabled:opacity-60 ${
-                            !isApproved
-                              ? "border-red-300 bg-red-50 text-red-700"
-                              : "border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50"
-                          }`}
-                        >
-                          {!isApproved ? "Rejected" : "Mark rejected"}
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            aria-pressed={isApproved}
+                            disabled={executionLocked}
+                            onClick={() =>
+                              setRuleDecisions((current) => ({
+                                ...current,
+                                [rule.id]: "approved",
+                              }))
+                            }
+                            className={`rounded-lg border px-3 py-2 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-700 disabled:cursor-not-allowed disabled:opacity-60 ${
+                              isApproved
+                                ? "border-emerald-300 bg-emerald-50 text-emerald-700"
+                                : "border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50"
+                            }`}
+                          >
+                            {isApproved ? "Approved" : "Approve"}
+                          </button>
+                          <button
+                            type="button"
+                            aria-pressed={!isApproved}
+                            disabled={executionLocked}
+                            onClick={() =>
+                              setRuleDecisions((current) => ({
+                                ...current,
+                                [rule.id]: "rejected",
+                              }))
+                            }
+                            className={`rounded-lg border px-3 py-2 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-700 disabled:cursor-not-allowed disabled:opacity-60 ${
+                              !isApproved
+                                ? "border-red-300 bg-red-50 text-red-700"
+                                : "border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50"
+                            }`}
+                          >
+                            {!isApproved ? "Rejected" : "Reject"}
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </section>
 
           <section className="space-y-4 rounded-2xl border border-zinc-200 bg-zinc-50 p-5">
             <h3 className="text-lg font-semibold tracking-tight text-zinc-900">
               Execute approved rules
             </h3>
-            <label
-              htmlFor="sample-records"
-              className="block text-sm font-semibold text-zinc-800"
-            >
-              Sample records (JSON array)
-            </label>
-            <textarea
-              id="sample-records"
-              value={recordsInput}
-              onChange={(event) => setRecordsInput(event.target.value)}
-              className="min-h-56 w-full rounded-2xl border border-zinc-300 bg-white px-4 py-3 font-mono text-sm text-zinc-900 outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
-              aria-describedby="sample-records-help"
-              disabled={executionLocked}
-            />
-            <p id="sample-records-help" className="text-sm text-zinc-500">
-              Provide a non-empty JSON array of record objects.
-            </p>
 
             <div className="flex items-center justify-between gap-4">
               <p className="text-sm text-zinc-500">
@@ -412,26 +594,45 @@ export function DataQualityRulesPlayground({
           </section>
 
           {completedExecution && (
-            <section className="space-y-5 rounded-2xl border border-zinc-200 bg-white p-5">
-              <h3 className="text-lg font-semibold tracking-tight text-zinc-900">
-                Quality scorecard
-              </h3>
+            <section className="space-y-5 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
+              <div className="flex flex-wrap items-end justify-between gap-4">
+                <div>
+                  <h3 className="text-lg font-semibold tracking-tight text-zinc-900">
+                    Quality scorecard
+                  </h3>
+                  <p className="mt-1 text-sm text-zinc-600">
+                    Execution complete. Deterministic evaluation is locked for this
+                    execution ID.
+                  </p>
+                  <p className="mt-2 text-sm text-zinc-600">
+                    This score shows how many approved rule checks passed across all
+                    sample records.
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-indigo-200 bg-indigo-50 px-4 py-3 text-right">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-indigo-700">
+                    Overall quality score
+                  </p>
+                  <p className="mt-1 text-3xl font-semibold text-indigo-900">
+                    {completedExecution.qualityScore}%
+                  </p>
+                </div>
+              </div>
 
-              <dl className="grid gap-3 sm:grid-cols-2">
+              <div className="h-2 rounded-full bg-zinc-200" aria-hidden="true">
+                <div
+                  className="h-full rounded-full bg-indigo-600"
+                  style={{ width: `${completedExecution.qualityScore}%` }}
+                />
+              </div>
+
+              <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 <div>
                   <dt className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">
                     Status
                   </dt>
                   <dd className="mt-1 text-sm text-zinc-900">
                     Completed ({completedExecution.status})
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">
-                    Quality score
-                  </dt>
-                  <dd className="mt-1 text-sm text-zinc-900">
-                    {completedExecution.qualityScore}%
                   </dd>
                 </div>
                 <div>
@@ -476,6 +677,22 @@ export function DataQualityRulesPlayground({
                 </div>
                 <div>
                   <dt className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">
+                    Provider
+                  </dt>
+                  <dd className="mt-1 text-sm text-zinc-900">
+                    {completedExecution.provider}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">
+                    Capability version
+                  </dt>
+                  <dd className="mt-1 text-sm text-zinc-900">
+                    {completedExecution.capabilityVersion}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">
                     Completed at / Latency
                   </dt>
                   <dd className="mt-1 text-sm text-zinc-900">
@@ -484,16 +701,55 @@ export function DataQualityRulesPlayground({
                 </div>
               </dl>
 
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  onClick={handleCopyExecutionId}
+                  className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50"
+                >
+                  Copy execution ID
+                </button>
+                {copyState === "copied" && (
+                  <span className="text-sm text-emerald-700">Copied</span>
+                )}
+                {copyState === "failed" && (
+                  <span className="text-sm text-red-700">Copy failed</span>
+                )}
+              </div>
+
               <div className="space-y-3">
                 <h4 className="text-sm font-semibold uppercase tracking-[0.16em] text-zinc-600">
                   Rule results
                 </h4>
                 <ul className="space-y-2">
-                  {completedExecution.ruleResults.map((result) => (
-                    <li key={result.ruleId} className="rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-800">
-                      Rule {result.ruleId} ({result.type} on {result.field}) - Passed: {result.passed}, Failed: {result.failed}
-                    </li>
-                  ))}
+                  {completedExecution.ruleResults.map((result) => {
+                    const totalChecks = result.passed + result.failed;
+                    const passRate =
+                      totalChecks > 0
+                        ? Math.round((result.passed / totalChecks) * 100)
+                        : 0;
+
+                    return (
+                      <li
+                        key={result.ruleId}
+                        className="rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-800"
+                      >
+                        <p className="font-medium text-zinc-900">
+                          {result.ruleId} ({result.type} on {result.field})
+                        </p>
+                        <p className="mt-1 text-zinc-600">
+                          Passed: {result.passed} · Failed: {result.failed}
+                        </p>
+                        <div className="mt-2 h-2 rounded-full bg-zinc-200" aria-hidden="true">
+                          <div
+                            className="h-full rounded-full bg-emerald-600"
+                            style={{ width: `${passRate}%` }}
+                          />
+                        </div>
+                        <p className="mt-1 text-xs text-zinc-600">Pass rate: {passRate}%</p>
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
 
@@ -504,8 +760,11 @@ export function DataQualityRulesPlayground({
                 {completedExecution.failedRecords.length ? (
                   <ul className="space-y-2">
                     {completedExecution.failedRecords.map((failed) => (
-                      <li key={`${failed.recordIndex}-${failed.failedRuleIds.join("-")}`} className="rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-800">
-                        Record index {failed.recordIndex} failed rules: {failed.failedRuleIds.join(", ")}
+                      <li
+                        key={`${failed.recordIndex}-${failed.failedRuleIds.join("-")}`}
+                        className="rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-800"
+                      >
+                        Record index {failed.recordIndex} · Failed rules: {failed.failedRuleIds.join(", ")}
                       </li>
                     ))}
                   </ul>

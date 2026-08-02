@@ -28,23 +28,23 @@ export async function ApiStatus() {
   const isHealthy = health?.status === "healthy";
 
   return (
-    <div className="flex items-center gap-2 text-sm">
+    <div className="inline-flex items-center gap-2 rounded-full border border-zinc-300 bg-zinc-50 px-3 py-1.5 text-sm">
       <span
-        className={`h-2.5 w-2.5 rounded-full ${
-          isHealthy ? "bg-emerald-500" : "bg-red-500"
+        className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold ${
+          isHealthy
+            ? "bg-emerald-100 text-emerald-700"
+            : "bg-red-100 text-red-700"
         }`}
         aria-hidden="true"
-      />
-
-      <span className="font-medium text-zinc-700">
-        API: {isHealthy ? "Healthy" : "Unavailable"}
+      >
+        {isHealthy ? "OK" : "!"}
       </span>
 
-      {health && (
-        <span className="text-zinc-500">
-          v{health.version}
-        </span>
-      )}
+      <span className="font-medium text-zinc-700">
+        API {isHealthy ? "Healthy" : "Unavailable"}
+      </span>
+
+      {health && <span className="text-zinc-500">v{health.version}</span>}
     </div>
   );
 }

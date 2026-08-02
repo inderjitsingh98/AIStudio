@@ -45,3 +45,28 @@ CAPABILITIES = [
 @capabilities_bp.get("/capabilities")
 def get_capabilities():
     return jsonify({"capabilities": CAPABILITIES})
+
+@capabilities_bp.get("/capabilities/<capability_id>")
+def get_capability_by_id(capability_id: str):
+    capability = next(
+        (
+            item
+            for item in CAPABILITIES
+            if item["id"] == capability_id
+        ),
+        None,
+    )
+
+    if capability is None:
+        return jsonify(
+            {
+                "error": {
+                    "code": "capability_not_found",
+                    "message": (
+                        f"Capability '{capability_id}' was not found."
+                    ),
+                }
+            }
+        ), 404
+
+    return jsonify({"capability": capability})

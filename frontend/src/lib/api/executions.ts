@@ -3,6 +3,11 @@ export type ExecutionRequest = {
   requirements: string;
 };
 
+export type ExecuteApprovedRulesRequest = {
+  approvedRuleIds: string[];
+  records: Record<string, unknown>[];
+};
+
 export type CandidateRule = {
   id: string;
   field: string;
@@ -21,6 +26,36 @@ export type ExecutionResponse = {
   capabilityVersion: string;
   provider: string;
   candidateRules: CandidateRule[];
+};
+
+export type RuleResult = {
+  ruleId: string;
+  field: string;
+  type: "required" | "minimum" | "format";
+  passed: number;
+  failed: number;
+};
+
+export type FailedRecord = {
+  recordIndex: number;
+  failedRuleIds: string[];
+};
+
+export type CompletedExecutionResponse = {
+  executionId: string;
+  status: "completed";
+  capabilityId: string;
+  capabilityVersion: string;
+  provider: string;
+  approvedRuleCount: number;
+  recordsProcessed: number;
+  recordsPassed: number;
+  recordsFailed: number;
+  qualityScore: number;
+  ruleResults: RuleResult[];
+  failedRecords: FailedRecord[];
+  latencyMs: number;
+  completedAt: string;
 };
 
 type ExecutionErrorResponse = {
@@ -69,4 +104,35 @@ export async function createCapabilityExecution(
   }
 
   return body as ExecutionResponse;
+}
+
+export async function executeCapabilityExecution(
+  executionId: string,
+  payload: ExecuteApprovedRulesRequest,
+): Promise<CompletedExecutionResponse> {
+  const response = await fetch(
+    `/api/executions/${encodeURIComponent(executionId)}/execute`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    },
+  );
+
+  const body = (await response.json()) as
+    | CompletedExecutionResponse
+    | ExecutionErrorResponse;
+
+  if (!response.ok) {
+    const errorBody = body as ExecutionErrorResponse;
+    throw new ExecutionRequestError(
+      errorBody.error?.message ?? "Execution request failed.",
+      errorBody.error?.code ?? "execution_request_failed",
+      response.status,
+    );
+  }
+
+  return body as CompletedExecutionResponse;
 }

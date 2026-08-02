@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { capabilities } from "@/data/capabilities";
+import { getCapabilityById } from "@/lib/api/capabilities";
 
 type CapabilityPageProps = {
   params: Promise<{
@@ -12,7 +12,7 @@ export default async function CapabilityPage({
   params,
 }: CapabilityPageProps) {
   const { id } = await params;
-  const capability = capabilities.find((item) => item.id === id);
+  const capability = await getCapabilityById(id);
 
   if (!capability) {
     notFound();

@@ -32,3 +32,34 @@ export async function getCapabilities(): Promise<Capability[]> {
 
   return payload.capabilities;
 }
+
+type CapabilityResponse = {
+  capability: Capability;
+};
+
+export async function getCapabilityById(
+  id: string,
+): Promise<Capability | null> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/capabilities/${encodeURIComponent(id)}`,
+    {
+      cache: "no-store",
+    },
+  );
+
+  if (response.status === 404) {
+    return null;
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      `Capability API request failed with status ${response.status}`,
+    );
+  }
+
+  const payload =
+    (await response.json()) as CapabilityResponse;
+
+  return payload.capability;
+}
+

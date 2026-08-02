@@ -1,6 +1,6 @@
 # Trusted Data AI Studio
 
-Trusted Data AI Studio is an interview-ready prototype of an enterprise AI capability marketplace where governed capabilities can be discovered and invoked through both a web application and MCP.
+Trusted Data AI Studio is a prototype of an enterprise AI capability marketplace where governed capabilities can be discovered and invoked through both a web application and MCP.
 
 ## Problem Statement
 
@@ -132,7 +132,6 @@ aiStudio/
 		package.json
 	docs/
 		architecture.md
-		demo-script.md
 		decisions/
 ```
 
@@ -289,7 +288,7 @@ MCP is implemented as a thin adapter over the same ExecutionService used by REST
 | mock provider | deterministic, fast, testable behavior without external model dependencies | add provider adapters for approved model platforms |
 | in-memory repository | simple state handling for local demo and tests | move to persistent database storage |
 | synchronous execution | reduced complexity for vertical-slice delivery | async execution workers and job orchestration |
-| one capability | deep slice over breadth for interview clarity | expand to versioned multi-capability catalog |
+| one capability | deep slice over breadth for implementation clarity | expand to versioned multi-capability catalog |
 | local stdio MCP | easiest secure local integration path | managed MCP deployment and access controls |
 | no authentication | keeps prototype focused on capability lifecycle | add authentication, authorization, and tenancy |
 
@@ -307,10 +306,9 @@ MCP is implemented as a thin adapter over the same ExecutionService used by REST
 - versioned capability manifests
 - CI/CD and deployment automation
 
-## Interview Talking Points
+## Key Takeaways
 
 - This is a platform design, not a prompt wrapper.
 - REST and MCP share one service layer.
 - AI proposes rules; deterministic application logic executes them.
 - Quality is enforced architecturally through contracts, validation, and workflow controls.
-- Copilot accelerated implementation, but engineering judgment defined boundaries and correctness.

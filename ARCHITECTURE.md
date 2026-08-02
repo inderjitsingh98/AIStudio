@@ -8,7 +8,7 @@ The detailed architecture specification, sequence diagrams, and state model live
 
 1. `frontend/` contains the Next.js marketplace UI and route handlers.
 2. `backend/` contains Flask APIs, execution service, rule engine, and MCP adapter.
-3. `docs/` contains architecture, demo script, and architecture decision records.
+3. `docs/` contains architecture and architecture decision records.
 
 ## Runtime Model
 

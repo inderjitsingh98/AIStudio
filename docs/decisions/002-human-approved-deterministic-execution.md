@@ -42,4 +42,4 @@ Negative:
 - rejected because deterministic backend controls are preferred
 
 3. Keep only generation with no execution
-- rejected because interview goal requires end-to-end vertical slice value
+- rejected because product goals require end-to-end vertical slice value

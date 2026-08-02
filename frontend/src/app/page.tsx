@@ -1,7 +1,10 @@
 import { CapabilityMarketplace } from "@/components/CapabilityMarketplace";
-import { capabilities } from "@/data/capabilities";
 import { ApiStatus } from "@/components/ApiStatus";
-export default function Home() {
+import { getCapabilities } from "@/lib/api/capabilities";
+
+export default async function Home() {
+  const capabilities = await getCapabilities();
+
   return (
     <div className="min-h-screen bg-zinc-100 text-zinc-950">
       <header className="border-b border-zinc-200 bg-white/95 backdrop-blur">

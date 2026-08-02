@@ -27,6 +27,12 @@ Use the canonical architecture diagrams in [docs/architecture.md](docs/architect
 4. MCP Invocation Sequence Diagram
 5. State Lifecycle Diagram
 
+## Ownership Notes
+
+1. UI behavior and capability interaction patterns are documented in frontend component files and API route handlers.
+2. Domain orchestration and execution guarantees are enforced in backend service and engine layers.
+3. Architecture decisions and rationale are tracked in `docs/decisions`.
+
 ## Quick System Sketch
 
 ```mermaid

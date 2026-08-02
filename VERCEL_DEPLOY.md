@@ -52,6 +52,12 @@ You can keep a clean split with:
 
 Set `BACKEND_API_URL=https://api.yourdomain.com` in frontend.
 
+## Quick Troubleshooting
+
+1. If UI calls fail with `backend_unavailable`, confirm `BACKEND_API_URL` is set in frontend project settings.
+2. If backend deploy is healthy but requests fail, verify backend root directory is `backend` and `vercel.json` is detected.
+3. After changing environment variables, trigger a frontend redeploy.
+
 ## Diagram: Deployed Request Path
 
 ```mermaid

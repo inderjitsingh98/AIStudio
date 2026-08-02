@@ -26,6 +26,13 @@ Discover capability
 -> execute approved rules
 -> view quality scorecard
 
+## Guiding Principles
+
+- Keep AI outputs structured and reviewable.
+- Execute business rules deterministically.
+- Reuse one service layer across interfaces.
+- Preserve clear error contracts for clients.
+
 ## Technology Stack
 
 Frontend
@@ -305,6 +312,13 @@ MCP is implemented as a thin adapter over the same ExecutionService used by REST
 - observability and cost metrics
 - versioned capability manifests
 - CI/CD and deployment automation
+
+## Additional Documentation
+
+- Architecture overview: [ARCHITECTURE.md](ARCHITECTURE.md)
+- Detailed architecture: [docs/architecture.md](docs/architecture.md)
+- Deployment guide: [VERCEL_DEPLOY.md](VERCEL_DEPLOY.md)
+- Decisions: [docs/decisions](docs/decisions)
 
 ## Key Takeaways
 

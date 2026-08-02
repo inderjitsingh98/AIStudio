@@ -1,4 +1,6 @@
-# Trusted Data AI Studio Architecture (Root Overview)
+# CapabilityForge AI Architecture (Root Overview)
+
+From natural-language intent to governed, executable AI capabilities.
 
 This root architecture document is the short entry point.
 

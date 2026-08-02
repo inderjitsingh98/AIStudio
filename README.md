@@ -1,6 +1,22 @@
-# Trusted Data AI Studio
+# CapabilityForge AI
 
-Trusted Data AI Studio is a prototype of an enterprise AI capability marketplace where governed capabilities can be discovered and invoked through both a web application and MCP.
+From natural-language intent to governed, executable AI capabilities.
+
+CapabilityForge AI is a personal engineering prototype exploring how AI-generated intent can move beyond prompt-response experiences and become a governed, testable, and executable enterprise capability.
+
+Many AI demos stop after generating text. Enterprise workflows require contracts, validation, human oversight, repeatability, and auditability.
+
+Natural-language interpretation is delegated to a provider abstraction, while execution remains controlled by deterministic application logic. The current AI provider is intentionally deterministic and mocked so architecture, contracts, tests, approval workflow, and MCP integration can be validated independently from model variability and vendor-specific APIs.
+
+AI interprets intent where ambiguity exists. Deterministic software governs execution where correctness matters.
+
+## Why I Built This
+
+I built this to explore the gap between AI demos and enterprise-grade workflows. A generated answer can be useful, but business-critical systems need controls that are explicit, testable, and auditable.
+
+Instead of broad feature coverage, I implemented one complete vertical slice: Data Quality Rules. Natural-language requirements become structured candidate rules, a human approves or rejects those rules, and a deterministic engine executes only approved rules.
+
+I also wanted adapter flexibility without logic duplication. REST powers the web application and MCP powers AI-client invocation, while both adapters reuse the same `ExecutionService`. The implementation approach was spec-driven with TDD for deterministic behavior and bounded use of GitHub Copilot for acceleration.
 
 ## Problem Statement
 
@@ -57,6 +73,13 @@ Architecture Patterns
 - provider abstraction
 - repository abstraction
 - deterministic rule engine
+
+The same Data Quality Rules capability is accessible through:
+
+- REST for the web application
+- MCP for AI clients
+
+Both adapters reuse the same `ExecutionService`.
 
 ## Architecture Diagram
 

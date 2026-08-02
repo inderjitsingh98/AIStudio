@@ -13,8 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Trusted Data AI Studio",
-  description: "An enterprise marketplace for trusted data skills, apps, and agents.",
+  title: "CapabilityForge AI",
+  description:
+    "From natural-language intent to governed, executable AI capabilities.",
 };
 
 export default function RootLayout({

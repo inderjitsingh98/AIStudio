@@ -1,8 +1,8 @@
-# Trusted Data AI Studio Architecture
+# CapabilityForge AI Architecture
 
 ## 1. Context And Goals
 
-Trusted Data AI Studio demonstrates a governed enterprise AI capability pattern. The goal is to show one complete vertical slice where:
+CapabilityForge AI demonstrates a governed enterprise AI capability pattern. The goal is to show one complete vertical slice where:
 
 - capabilities can be discovered in a marketplace UI
 - candidate rules can be generated from schema and requirements
@@ -10,6 +10,8 @@ Trusted Data AI Studio demonstrates a governed enterprise AI capability pattern.
 - approved rules execute deterministically on sample records
 - results are surfaced as a quality scorecard
 - the same backend service is invoked by REST and MCP adapters
+
+The current AI provider is intentionally deterministic and mocked so contracts, workflow boundaries, and tests remain stable and repeatable.
 
 ## Diagram Catalog
 

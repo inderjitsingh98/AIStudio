@@ -1,6 +1,8 @@
-# Trusted Data AI Studio
+# CapabilityForge AI
 
-A small Next.js App Router app for browsing enterprise AI capabilities.
+From natural-language intent to governed, executable AI capabilities.
+
+This frontend is the web experience for CapabilityForge AI, a personal engineering prototype focused on governed and reusable enterprise AI capabilities.
 
 ## Quick Start
 

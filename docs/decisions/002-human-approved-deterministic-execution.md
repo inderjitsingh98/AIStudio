@@ -6,6 +6,8 @@ Accepted
 
 ## Context
 
+Within CapabilityForge AI, enterprise-style governance requires safe paths from AI suggestion to execution.
+
 Enterprise environments need governed data-quality actions. Automatically executing unconstrained AI output is risky and difficult to audit.
 
 The prototype needed to demonstrate a safe path from suggestion to execution while preserving transparency and repeatability.

@@ -34,7 +34,7 @@ export function CapabilityMarketplace({
             Capability marketplace
           </h2>
           <p className="mt-2 text-base leading-7 text-zinc-600">
-            A focused catalog of reusable AI building blocks for data quality and lineage teams.
+            A focused catalog of governed, reusable AI capability building blocks for enterprise data workflows.
           </p>
         </div>
 

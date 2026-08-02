@@ -6,6 +6,8 @@ Accepted
 
 ## Context
 
+Within CapabilityForge AI, the same capability must be invocable from both browser workflows and AI clients.
+
 The capability must be invocable from both browser workflows and AI clients. Duplicating business logic across REST and MCP handlers would create drift and inconsistent validation or behavior.
 
 ## Decision

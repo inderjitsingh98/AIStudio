@@ -11,10 +11,10 @@ export default async function Home() {
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4 sm:px-8 lg:px-10">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-indigo-600">
-              Enterprise AI Marketplace
+              CapabilityForge AI
             </p>
             <p className="mt-1 text-lg font-semibold tracking-tight text-zinc-950">
-              Trusted Data AI Studio
+              From natural-language intent to governed, executable AI capabilities.
             </p>
           </div>
 
@@ -38,13 +38,13 @@ export default async function Home() {
           <div className="grid gap-10 px-6 py-10 sm:px-8 lg:grid-cols-[minmax(0,1.5fr)_minmax(320px,1fr)] lg:px-10 lg:py-12">
             <div className="max-w-3xl">
               <p className="text-sm font-semibold uppercase tracking-[0.24em] text-indigo-600">
-                Curated capabilities
+                Enterprise capability prototype
               </p>
               <h1 className="mt-4 max-w-2xl text-4xl font-semibold tracking-tight text-zinc-950 sm:text-5xl">
-                Discover trusted AI capabilities for enterprise data operations.
+                Governed AI capabilities from intent to deterministic execution.
               </h1>
               <p className="mt-5 max-w-2xl text-base leading-7 text-zinc-600 sm:text-lg">
-                Browse production-ready skills, guided apps, and specialist agents designed to improve data quality, lineage visibility, and governance workflows.
+                The first vertical slice is Data Quality Rules: AI proposes structured candidate rules from natural-language requirements, a human approves or rejects them, and a deterministic engine executes only approved rules with a traceable scorecard. The same capability is available through REST for the web app and MCP for AI clients.
               </p>
             </div>
 

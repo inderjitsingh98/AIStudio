@@ -6,7 +6,7 @@ Accepted
 
 ## Context
 
-The prototype needs AI-assisted rule generation while maintaining repeatability, testability, and clear separation between orchestration and provider implementation.
+Within CapabilityForge AI, the prototype needs AI-assisted rule generation while maintaining repeatability, testability, and clear separation between orchestration and provider implementation.
 
 A direct dependency from core workflow logic to one concrete provider would make testing harder and would couple the prototype to one implementation style.
 
